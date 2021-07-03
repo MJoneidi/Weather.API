@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace Weather.API.Models.Dto
 {
-    public class WeatherResponse
+    public class ErrorResponse
     {
+        public string ErrorCode { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }

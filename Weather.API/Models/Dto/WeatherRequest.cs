@@ -7,5 +7,6 @@ namespace Weather.API.Models.Dto
 {
     public class WeatherRequest
     {
+
     }
 }

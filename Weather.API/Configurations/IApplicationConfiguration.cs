@@ -11,5 +11,6 @@ namespace Weather.API.Configurations
     public interface IApplicationConfiguration
     {
         string ServiceUrl { get; set; }
+        string APIKey { get; set; }
     }
 }

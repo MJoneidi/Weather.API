@@ -12,20 +12,19 @@ namespace Weather.API.Adapters
     public class OpenWeathermapAdapter: IWeatherServiceAdapter
     {
         private readonly IApplicationConfiguration _applicationConfiguration;
-        private readonly IRequestSender<WeatherResponse> _requestSender;
+        private readonly IRequestSender<dynamic> _requestSender;
 
 
-        public OpenWeathermapAdapter(IApplicationConfiguration applicationConfiguration, IRequestSender<WeatherResponse> requestSender)
+        public OpenWeathermapAdapter(IApplicationConfiguration applicationConfiguration, IRequestSender<dynamic> requestSender)
         {
             _applicationConfiguration = applicationConfiguration;
             _requestSender = requestSender;
         }
 
-        public async Task<WeatherResponse> SendRequestAsync(WeatherRequest request)
+        public async Task<dynamic> SendRequestAsync(string requestUri)
         {
-            string jsonString = JsonConvert.SerializeObject(request);
-
-            return await _requestSender.SendAsync(_applicationConfiguration.ServiceUrl, "", jsonString);
+            requestUri = $"{ requestUri}&appid={_applicationConfiguration.APIKey}";
+            return await _requestSender.SendGetAsync(_applicationConfiguration.ServiceUrl, requestUri);
         }
 
     }

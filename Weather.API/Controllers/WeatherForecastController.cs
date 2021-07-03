@@ -3,6 +3,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Weather.API.Models.Dto;
+using Weather.API.Processors;
 
 namespace Weather.API.Controllers
 {
@@ -16,23 +19,34 @@ namespace Weather.API.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IWeatherProcessors _weatherProcessors;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IWeatherProcessors weatherProcessors)
         {
             _logger = logger;
+            _weatherProcessors = weatherProcessors;
         }
 
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("GetByCity")]
+        public async Task<ActionResult> GetByCityAsync(string cityName)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            var response = await _weatherProcessors.ProcessAsync($"forecast?q={cityName}");
+            if (response != null)
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                return Ok(response);
+            }
+            return StatusCode(404, new ErrorResponse() { ErrorCode = "500", ErrorMessage = "openweathermap does not work currently." });
+        }
+
+        [HttpGet("GetByZipCode")]
+        public async Task<ActionResult> GetByZipCodeAsync(string zipCode)
+        {
+            var response = await _weatherProcessors.ProcessAsync($"forecast?zip={zipCode}");
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return StatusCode(404, new ErrorResponse() { ErrorCode = "500", ErrorMessage = $"openweathermap does not work currently." });
         }
     }
 }

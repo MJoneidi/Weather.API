@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,7 +10,7 @@ using Weather.API.Configurations;
 using Weather.API.Infrastructure;
 using Weather.API.Models.Dto;
 using Weather.API.Persistence;
-using Weather.API.Services;
+using Weather.API.Processors;
 
 namespace Weather.API
 {
@@ -36,10 +37,11 @@ namespace Weather.API
 
 
             services.AddScoped<IWeatherRepository, WeatherRepository>();
+            services.AddDbContext<WeatherDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:PaymentDB"]));
             services.AddSingleton<IApplicationConfiguration>(x => new ApplicationConfiguration(Configuration));
             
             services.AddScoped<IWeatherServiceAdapter, OpenWeathermapAdapter>();  
-            services.AddScoped<IRequestSender<WeatherResponse>, HttpRequestSender<WeatherResponse>>();
+            services.AddScoped<IRequestSender<dynamic>, HttpRequestSender<dynamic>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

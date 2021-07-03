@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 using Weather.API.Adapters;
 using Weather.API.Configurations;
 using Weather.API.Infrastructure;
@@ -37,7 +38,7 @@ namespace Weather.API
 
 
             services.AddScoped<IWeatherRepository, WeatherRepository>();
-            services.AddDbContext<WeatherDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:PaymentDB"]));
+            services.AddDbContext<WeatherDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:WeatherDB"]));
             services.AddSingleton<IApplicationConfiguration>(x => new ApplicationConfiguration(Configuration));
             
             services.AddScoped<IWeatherServiceAdapter, OpenWeathermapAdapter>();  
@@ -54,6 +55,8 @@ namespace Weather.API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather.API v1"));
             }
 
+            GenerateDB(app);
+
             app.UseRouting();
 
             app.UseAuthorization();
@@ -63,5 +66,25 @@ namespace Weather.API
                 endpoints.MapControllers();
             });
         }
+
+        private void GenerateDB(IApplicationBuilder app)
+        {
+            try
+            {
+                using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    using (var context = serviceScope.ServiceProvider.GetService<WeatherDbContext>())
+                    {
+                        context.Database.EnsureCreated();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //TODO: handle 
+                throw;
+            }
+        }
+
     }
 }

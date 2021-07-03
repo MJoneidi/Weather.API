@@ -8,6 +8,10 @@ namespace Weather.API.Models.Dto
 {
     public class WeatherForecastResponse
     {
+        public WeatherForecastResponse()
+        {
+            WeatherInfos = new List<WeatherInfo>();
+        }
         public string City { get; set; }
         public string Summary { get; set; }
         public List<WeatherInfo> WeatherInfos { get; set; }         

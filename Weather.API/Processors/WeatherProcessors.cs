@@ -9,7 +9,7 @@ using Weather.API.Persistence;
 
 namespace Weather.API.Processors
 {
-    public class WeatherProcessors: IWeatherProcessors
+    public class WeatherProcessors : IWeatherProcessors
     {
         private readonly IWeatherServiceAdapter _weatherServiceAdapter;
         private readonly IWeatherRepository _repository;
@@ -28,31 +28,27 @@ namespace Weather.API.Processors
         /// <returns>Weather response from api</returns>
         public async Task<WeatherForecastResponse> ProcessAsync(string requestUri)
         {
+            var result = new WeatherForecastResponse();
             var response = await _weatherServiceAdapter.SendRequestAsync(requestUri);
 
             if (response != null)
-                foreach (var date in response.List)
+            {
+                result.City = response.city.name;
+                foreach (var item in response.list)
+                {
                     await _repository.SaveWeatherHistoryAsync(new WeatherHistory()
                     {
-                        CityID = response.City.Id,
-                        Date = Convert.ToDateTime(date.DtTxt),
-                        Humidity = date.Main.Humidity,
-                        Temperature = date.Main.Temp
+                        CityID = response.city.id,
+                        Date = Convert.ToDateTime(item.dt_txt),
+                        Humidity = item.main.humidity,
+                        Temperature = item.main.temp
                     });
 
-            var result = new WeatherForecastResponse()
-            {
-                City = response.City.Name,
-                WeatherInfos = new List<WeatherInfo>()
-                {
-                    new WeatherInfo(){ Date = Convert.ToDateTime(response.List[0].DtTxt), Humidity = response.List[0].Main.Humidity, TemperatureC= response.List[0].Main.Temp, WindSpeed= response.List[0].Wind.Speed },
-                    new WeatherInfo(){ Date = Convert.ToDateTime(response.List[1].DtTxt), Humidity = response.List[1].Main.Humidity, TemperatureC= response.List[1].Main.Temp, WindSpeed= response.List[1].Wind.Speed },
-                    new WeatherInfo(){ Date = Convert.ToDateTime(response.List[2].DtTxt), Humidity = response.List[2].Main.Humidity, TemperatureC= response.List[2].Main.Temp, WindSpeed= response.List[2].Wind.Speed },
-                    new WeatherInfo(){ Date = Convert.ToDateTime(response.List[3].DtTxt), Humidity = response.List[3].Main.Humidity, TemperatureC= response.List[3].Main.Temp, WindSpeed= response.List[3].Wind.Speed },
-
+                    var info = new WeatherInfo() { Date = Convert.ToDateTime(item.dt_txt), Humidity = item.main.humidity, TemperatureC = item.main.temp, WindSpeed = item.wind.speed };
+                    result.WeatherInfos.Add(info);
                 }
-            };
 
+            }
             return await Task.FromResult(result);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,59 +7,70 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Helpers;
 using Weather.API.Models.Exceptions;
 
 namespace Weather.API.Infrastructure
 {
     public class HttpRequestSender<T> : IRequestSender<T> where T : new()
     {
+        private readonly ILogger<HttpRequestSender<T>> _logger;
+
+        public HttpRequestSender(ILogger<HttpRequestSender<T>> logger)
+        {
+            _logger = logger;
+        }
         public async Task<dynamic> SendPostAsync(string url, string queryString, string jsonPayload)
         {
-            HttpClient client = new HttpClient { BaseAddress = new Uri(url) };
-
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await client.PostAsync(queryString, content);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // Parse the response body.
-                var result = await response.Content.ReadAsStringAsync();
+                HttpClient client = new HttpClient { BaseAddress = new Uri(url) };
 
-                client.Dispose();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                return Json.Decode(result);               
+                HttpContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync(queryString, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse the response body.
+                    var jsonData = await response.Content.ReadAsStringAsync();
+                    client.Dispose();
+                    return JsonConvert.DeserializeObject<dynamic>(jsonData.ToString());
+                }
+                else
+                {
+                    throw new HttpSenderException(response.StatusCode.ToString(), response.ReasonPhrase);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                throw new HttpSenderException(response.StatusCode.ToString(), response.ReasonPhrase);
+                _logger.LogError(ex.Message);
             }
+            return null;
         }
 
         public async Task<dynamic> SendGetAsync(string url, string queryString)
         {
-            HttpClient client = new HttpClient { BaseAddress = new Uri(url) };
-
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpResponseMessage response = await client.GetAsync(queryString);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // Parse the response body.
-                var result = await response.Content.ReadAsStringAsync();
-
-                client.Dispose();
-
-                return Json.Decode(result);                
+                HttpClient client = new HttpClient { BaseAddress = new Uri(url) };
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync(queryString);
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonData = await response.Content.ReadAsStringAsync();
+                    client.Dispose();
+                    return JsonConvert.DeserializeObject<dynamic>(jsonData.ToString());
+                }
+                else                
+                    throw new HttpSenderException(response.StatusCode.ToString(), response.ReasonPhrase);                
             }
-            else
+            catch (Exception ex)
             {
-                throw new HttpSenderException(response.StatusCode.ToString(), response.ReasonPhrase);
+                _logger.LogError(ex.Message);
             }
+            return null;
         }
     }
 }

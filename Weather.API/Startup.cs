@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Weather.API.Persistence;
 
 namespace Weather.API
 {
@@ -25,6 +26,8 @@ namespace Weather.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Weather.API", Version = "v1" });
             });
+
+            services.AddScoped<IWeatherRepository, WeatherRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

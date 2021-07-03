@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Weather.API.Models.Entities
@@ -8,11 +9,9 @@ namespace Weather.API.Models.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-
         public int CityID { get; set; }
-
         public int Humidity { get; set; }
-
         public double Temperature { get; set; }
+        public DateTime Date { get; set; }
     }
 }

@@ -8,6 +8,10 @@ Make sure your returned json is refactoring-resilient, meaning a change to the m
 
 It is also your task to persist the current weather data each time a user queries weather data of a city in the browser. It is sufficient if you save the name of the city, the temperature and humidity. That should then appear in a separate "history" list in the UI.
 
+
+# Description
+I worked on VueJs and even implement connection to api and load the forcast api, but still I could not make it as good as I like it, I'd preffered to not upload it, sorry for inconvenience
+
 # Run the project
 
 All you need to do is running this command

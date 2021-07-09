@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Weather.API.Adapters;
 using Weather.API.Models.Dto;
@@ -36,6 +34,9 @@ namespace Weather.API.Processors
                 result.City = response.city.name;
                 foreach (var item in response.list)
                 {
+                    //limit to 5 days
+                    //if (Convert.ToDateTime(item.dt_txt) > DateTime.Now.AddDays(5))
+                    //    break;
                     await _repository.SaveWeatherHistoryAsync(new WeatherHistory()
                     {
                         CityID = response.city.id,
@@ -44,7 +45,7 @@ namespace Weather.API.Processors
                         Temperature = item.main.temp
                     });
 
-                    var info = new WeatherInfo() { Date = Convert.ToDateTime(item.dt_txt), Humidity = item.main.humidity, TemperatureC = item.main.temp, WindSpeed = item.wind.speed };
+                    var info = new WeatherInfo() { Date = Convert.ToDateTime(item.dt_txt), Humidity = item.main.humidity, TemperatureF = item.main.temp, WindSpeed = item.wind.speed };
                     result.WeatherInfos.Add(info);
                 }
 

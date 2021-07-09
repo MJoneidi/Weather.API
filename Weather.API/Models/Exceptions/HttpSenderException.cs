@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Weather.API.Models.Exceptions
+﻿namespace Weather.API.Models.Exceptions
 {
     public class HttpSenderException : ApiException
     {

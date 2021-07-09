@@ -9,7 +9,6 @@ using System;
 using Weather.API.Adapters;
 using Weather.API.Configurations;
 using Weather.API.Infrastructure;
-using Weather.API.Models.Dto;
 using Weather.API.Persistence;
 using Weather.API.Processors;
 
@@ -40,8 +39,8 @@ namespace Weather.API
             services.AddScoped<IWeatherRepository, WeatherRepository>();
             services.AddDbContext<WeatherDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:WeatherDB"]));
             services.AddSingleton<IApplicationConfiguration>(x => new ApplicationConfiguration(Configuration));
-            
-            services.AddScoped<IWeatherServiceAdapter, OpenWeathermapAdapter>();  
+
+            services.AddScoped<IWeatherServiceAdapter, OpenWeathermapAdapter>();
             services.AddScoped<IRequestSender<dynamic>, HttpRequestSender<dynamic>>();
         }
 

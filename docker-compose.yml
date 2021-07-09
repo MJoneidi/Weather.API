@@ -8,7 +8,8 @@ services:
       dockerfile: Weather.API/Dockerfile
     depends_on:
       - sql.server
-
+    ports:
+      - 7001:7001
   sql.server:
     image: mcr.microsoft.com/mssql/server:2017-latest
     environment:

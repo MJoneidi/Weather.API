@@ -1,8 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Weather.API.Configurations
 {
@@ -16,6 +12,6 @@ namespace Weather.API.Configurations
 
         public string ServiceUrl { get; set; }
         public string APIKey { get; set; }
-        
+
     }
 }
